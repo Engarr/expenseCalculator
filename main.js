@@ -15,19 +15,21 @@ const deleteAllBtn = document.querySelector('.delete-all');
 
 const error = document.querySelector('.error');
 const transactionList = document.querySelector('.transaction-list');
+const lightBtn = document.querySelector(".light")
+const darkBtn = document.querySelector(".dark")
 
-let root =document.documentElement;
+let root = document.documentElement;
 let ID = 0;
 let categoryIcon;
 let selectedCategory;
-const moneyArr = [0];
-
+let moneyArr = [0];
 
 let sumAvailableMoney = 0;
 
 let incomeToDelete;
-let expenseToDelete
+let expenseToDelete;
 //////////////////////////////////////////////////////
+
 
 
 //////////////////////////////////////////////////////
@@ -40,31 +42,30 @@ const closePanel = () => {
 };
 //////////////////////////////////////////////////////
 
-
 const addNewTransaction = () => {
 	if (
-		transactionName.value !== '' &&transactionAmount.value !== '' &&category !== 'none'
-		) {		createNewTransaction();
-			error.textContent = '';
-			transactionDateClear();
-			closePanel();
-		} 
-		else {
-			error.textContent = 'Musisz uzupełnić wszystkie pola';
-		}
-	};
-	
+		transactionName.value !== '' &&
+		transactionAmount.value !== '' &&
+		category !== 'none'
+	) {
+		createNewTransaction();
+		error.textContent = '';
+		transactionDateClear();
+		closePanel();
+	} else {
+		error.textContent = 'Musisz uzupełnić wszystkie pola';
+	}
+};
+
 const transactionDateClear = () => {
-		transactionName.value = '';
-		transactionAmount.value = '';
-		category.value = 0;
-	};
-	
+	transactionName.value = '';
+	transactionAmount.value = '';
+	category.value = 0;
+};
+
 //////////////////////////////////////////////////////
 
-
 const createNewTransaction = () => {
-	
 	const newTransaction = document.createElement('div');
 	newTransaction.classList.add('transaction');
 	newTransaction.setAttribute('id', ID);
@@ -72,18 +73,21 @@ const createNewTransaction = () => {
 	newTransaction.innerHTML = `
     <p class="transaction-name">
 	${categoryIcon} ${transactionName.value} </p>
-	<p class="transaction-amount"> ${transactionAmount.value} zł<button class="delete" onclick = 'transactionToClose(${ID})'><i class="fas fa-times"></i></button></p>
+	<p class="transaction-amount"> ${transactionAmount.value} zł<button class="delete" onclick = 'deleteTransaction(${ID})'><i class="fas fa-times"></i></button></p>
 	</div>`;
-	transactionAmount.value > 0
-		? incomeArea.appendChild(newTransaction) &&
-		  newTransaction.classList.add('income')
-		: expensesArea.appendChild(newTransaction) &&
-		  newTransaction.classList.add('expense');
+	if (transactionAmount.value > 0) {
+		incomeArea.appendChild(newTransaction);
+		newTransaction.classList.add('income');
+	} else {
+		expensesArea.appendChild(newTransaction);
+		newTransaction.classList.add('.expense');
+	}
 	moneyArr.push(parseFloat(transactionAmount.value));
 	countMoney(moneyArr);
-
 	ID++;
 };
+
+//////////////////////////////////////////////////////
 
 const selectetCategory = () => {
 	selectedCategory = category.options[category.selectedIndex].text;
@@ -105,38 +109,56 @@ const checkIcon = (transaction) => {
 			break;
 	}
 };
+
+//////////////////////////////////////////////////////
 const countMoney = (money) => {
 	const newMoney = money.reduce((a, b) => a + b);
 	availableMoney.textContent = `${newMoney} zł`;
 };
+//////////////////////////////////////////////////////
 
+const deleteTransaction = (id) => {
+	const transactionToDelete = document.getElementById(id);
+	const amountValue = parseFloat(transactionToDelete.childNodes[3].innerText);
+	const indexOfTransaction = moneyArr.indexOf(amountValue);
+	moneyArr.splice(indexOfTransaction, 1);
 
-
-
-const transactionToClose = (id)=>{
-let closeTransaction = document.getElementById(id)
-incomeArea.removeChild(closeTransaction)
-}
-
-
-
-
-
-const deleteAllTransaction = () => {
-	incomeToDelete = document.getElementsByClassName('income');
-	expenseToDelete = document.getElementsByClassName('expense');
-	while (incomeToDelete.length > 0) incomeToDelete[0].remove();
-	while (expenseToDelete.length > 0) expenseToDelete[0].remove();
-	moneyArr.length = 0;
-	availableMoney.textContent=""
+	if (transactionToDelete.classList.contains('income')) {
+		incomeArea.removeChild(transactionToDelete);
+	} else {
+		expensesArea.removeChild(transactionToDelete);
+	}
+	countMoney(moneyArr);
 };
 
 //////////////////////////////////////////////////////
 
+const deleteAllTransaction=()=>{
+	incomeArea.innerHTML = "<h3>Przychód:</h3>"
+	expensesArea.innerHTML= "<h3>Wydatki:</h3>"
+	availableMoney.textContent = "0 zł"
+	moneyArr = [0]
+}
 
+//////////////////////////////////////////////////////
 
 addTransactionBtn.addEventListener('click', showPanel);
 cancelBtn.addEventListener('click', closePanel);
 
 saveBtn.addEventListener('click', addNewTransaction);
 deleteAllBtn.addEventListener('click', deleteAllTransaction);
+
+lightBtn.addEventListener('click', () => {
+	root.style.setProperty('--first-color', `#f9f9f9`)
+	root.style.setProperty('--second-color', `#14161f`)
+	root.style.setProperty('--border-color', `rgba(0, 0, 0, 0.2)`)
+
+})
+darkBtn.addEventListener('click', () => {
+	root.style.setProperty('--first-color', `#14161f`)
+	root.style.setProperty('--second-color', `#f9f9f9`)
+	root.style.setProperty('--border-color', `#f9f9f9`)
+
+})
+
+
